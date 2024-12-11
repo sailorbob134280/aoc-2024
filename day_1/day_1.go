@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	_ "embed"
 	"errors"
 	"flag"
 	"fmt"
@@ -18,6 +19,9 @@ import (
 // Left_1 Right_1
 // Left_2 Right_2
 // etc
+
+//go:embed data.txt
+var data []byte
 
 var ErrBadFile = errors.New("input file is badly formatted")
 
@@ -53,7 +57,7 @@ func NewLocations(data io.Reader) (*Locations, error) {
 			return nil, ErrBadFile
 		}
 
-		l.Right, err = appendFromString(l.Left, words.Text())
+		l.Right, err = appendFromString(l.Right, words.Text())
 		if err != nil {
 			return nil, err
 		}
