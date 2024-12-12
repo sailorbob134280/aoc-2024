@@ -2,9 +2,9 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	_ "embed"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"log/slog"
@@ -13,6 +13,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/sailorbob134280/aoc-2024/utils"
 )
 
 // The file is in a file, with each list separated by a space on separate line. E.g.
@@ -68,23 +70,7 @@ func NewLocations(data io.Reader) (*Locations, error) {
 
 func main() {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, nil)))
-
-	filename := flag.String("datafile", "data.txt", "The input data file to parse")
-	flag.Parse()
-
-	if filename == nil || *filename == "" {
-		slog.Error("Filename is invalid, exiting")
-		os.Exit(1)
-	}
-
-	// Ingest each list
-	f, err := os.Open(*filename)
-	if err != nil {
-		slog.Error("Failed to open file", "err", err)
-		os.Exit(1)
-	}
-
-	l, err := NewLocations(f)
+	l, err := NewLocations(bytes.NewBuffer(data))
 	if err != nil {
 		slog.Error("Failed to parse input file", "err", err)
 		os.Exit(1)
@@ -98,7 +84,7 @@ func main() {
 	// We assume the lists are the same length because otherwise the file is malformed
 	var res, sim int
 	for i := range l.Left {
-		res += distance(l.Left[i], l.Right[i])
+		res += utils.Distance(l.Left[i], l.Right[i])
 		sim += l.Left[i] * numOccurances(l.Right, l.Left[i])
 	}
 
@@ -128,14 +114,4 @@ func appendFromString(arr []int, s string) ([]int, error) {
 	}
 	arr = append(arr, n)
 	return arr, nil
-}
-
-// Go inexplicably does not have an abs function for ints, and I have
-// been bitten by float casting far too many times to do it that way,
-// so we write our own.
-func distance(a, b int) int {
-	if a < b {
-		return b - a
-	}
-	return a - b
 }
