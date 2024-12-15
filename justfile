@@ -1,2 +1,2 @@
 run day: 
-  go run {{day}}/{{day}}.go
+  go run day_{{day}}/day_{{day}}.go
